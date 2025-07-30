@@ -7,13 +7,22 @@ import {
   getBalanceAndNonce
 } from '../utils/octraWallet'
 
+interface OctraWallet {
+  address: string;
+  privateKey: string;
+  publicKey: string;
+  private_key_b64: string;
+  public_key_b64: string;
+  mnemonic?: string[];
+  networkType: string;
+}
+
 const SimpleWallet = () => {
-  // Wallet State
-  const [activeWallet, setActiveWallet] = useState<any>(null)
+  const [activeWallet, setActiveWallet] = useState<OctraWallet | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPrivateKey, setShowPrivateKey] = useState(false)
-  const [currentWalletData, setCurrentWalletData] = useState<any>(null)
+  const [currentWalletData, setCurrentWalletData] = useState<OctraWallet | null>(null)
   const [balance, setBalance] = useState('0')
   
   // Import wallet state
