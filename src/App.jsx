@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { generateOctraWallet, importOctraWallet, sendDailyTransaction } from './utils/octraWallet'
 
 function App() {
   const [wallet, setWallet] = useState(null)
@@ -10,14 +9,26 @@ function App() {
   const [isDailySending, setIsDailySending] = useState(false)
   const [dailyResult, setDailyResult] = useState(null)
 
+  // Test with simple mock first
   const handleCreateWallet = async () => {
     setIsLoading(true)
     setError('')
     try {
-      const newWallet = await generateOctraWallet()
-      setWallet(newWallet)
+      console.log('Creating wallet...')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const mockWallet = {
+        address: 'oct1234567890abcdef1234567890abcdef12345678',
+        privateKey: 'mock_private_key_hex_format_64_characters_long_example_here',
+        private_key_b64: 'bW9ja19wcml2YXRlX2tleV9iYXNlNjRfZm9ybWF0',
+        mnemonic: ['abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse', 'access', 'accident']
+      }
+      
+      console.log('Mock wallet created:', mockWallet)
+      setWallet(mockWallet)
     } catch (error) {
-      setError(error.message)
+      console.error('Error creating wallet:', error)
+      setError('Failed to create wallet: ' + error.message)
     } finally {
       setIsLoading(false)
     }
@@ -31,12 +42,23 @@ function App() {
     setIsLoading(true)
     setError('')
     try {
-      const importedWallet = await importOctraWallet(importKey.trim())
-      setWallet(importedWallet)
+      console.log('Importing wallet...')
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      const mockWallet = {
+        address: 'oct9876543210fedcba9876543210fedcba98765432',
+        privateKey: importKey.trim(),
+        private_key_b64: btoa(importKey.trim().slice(0, 32)),
+        networkType: 'MainCoin'
+      }
+      
+      console.log('Mock wallet imported:', mockWallet)
+      setWallet(mockWallet)
       setShowImport(false)
       setImportKey('')
     } catch (error) {
-      setError(error.message)
+      console.error('Error importing wallet:', error)
+      setError('Failed to import wallet: ' + error.message)
     } finally {
       setIsLoading(false)
     }
@@ -50,17 +72,30 @@ function App() {
     setIsDailySending(true)
     setDailyResult(null)
     try {
-      const result = await sendDailyTransaction(wallet.privateKey, wallet.address)
+      console.log('Sending daily OM...')
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      const success = Math.random() > 0.2 // 80% success rate
+      const result = {
+        success,
+        message: success ? 'Daily OM transaction sent successfully! 🕉️' : 'Transaction failed. Please try again.',
+        txHash: success ? 'tx_' + Math.random().toString(36).substr(2, 32) : undefined
+      }
+      
+      console.log('Daily OM result:', result)
       setDailyResult(result)
     } catch (error) {
+      console.error('Error sending daily OM:', error)
       setDailyResult({
         success: false,
-        message: error.message
+        message: 'Transaction failed: ' + error.message
       })
     } finally {
       setIsDailySending(false)
     }
   }
+
+  console.log('App rendering, wallet:', wallet)
 
   return (
     <div style={{
@@ -85,6 +120,21 @@ function App() {
         }}>
           🕉️ Octra Wallet
         </h1>
+        
+        {/* Debug Info */}
+        <div style={{
+          background: '#333',
+          padding: '1rem',
+          borderRadius: '0.5rem',
+          marginBottom: '2rem',
+          fontSize: '0.8rem',
+          textAlign: 'left'
+        }}>
+          <div>🔍 Debug Info:</div>
+          <div>Buffer available: {typeof window.Buffer !== 'undefined' ? '✅' : '❌'}</div>
+          <div>Process available: {typeof window.process !== 'undefined' ? '✅' : '❌'}</div>
+          <div>Wallet state: {wallet ? '✅ Loaded' : '❌ None'}</div>
+        </div>
         
         <div style={{
           background: 'white',
@@ -114,7 +164,7 @@ function App() {
               }}
               onClick={handleCreateWallet}
               disabled={isLoading}
-              onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
+              onMouseOver={(e) => !isLoading && (e.target.style.transform = 'scale(1.05)')}
               onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
             >
               {isLoading ? '⏳ Creating...' : '🚀 Create Wallet'}
@@ -165,7 +215,7 @@ function App() {
             marginBottom: '2rem',
             boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
           }}>
-            <h3 style={{ marginBottom: '1rem', color: '#10b981' }}>✅ Wallet Created!</h3>
+            <h3 style={{ marginBottom: '1rem', color: '#10b981' }}>✅ Wallet Ready!</h3>
             <div style={{ marginBottom: '1rem' }}>
               <strong>Address:</strong> 
               <div style={{ 
