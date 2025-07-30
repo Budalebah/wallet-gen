@@ -3,83 +3,87 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      {/* Header */}
-      <header className="header">
-        <div className="header-content">
-          <div className="logo">
-            <div className="logo-icon">O</div>
-            <div className="logo-text">Octra Wallet</div>
-          </div>
-          <nav>
-            <ul className="nav-links">
-              <li><a href="#" className="nav-link">Wallet</a></li>
-              <li><a href="#" className="nav-link">Security</a></li>
-              <li><a href="#" className="nav-link">Documentation</a></li>
-            </ul>
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="main-content">
-        {/* Hero Section */}
-        <section className="hero-section">
-          <h1 className="hero-title">🕉️ Octra OM Wallet</h1>
-          <p className="hero-subtitle">
-            Connect with the Octra network spiritually through daily OM transactions. 
-            Generate secure wallets and participate in the ecosystem's harmony.
+    <div style={{ minHeight: '100vh', background: 'var(--background-default-color)', color: 'white', padding: '20px' }}>
+      <h1 style={{ textAlign: 'center', fontSize: '3rem', marginBottom: '2rem' }}>
+        🕉️ Octra OM Wallet
+      </h1>
+      
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ 
+          background: 'var(--gray-0)', 
+          color: 'var(--text-main)',
+          padding: '2rem', 
+          borderRadius: '1rem', 
+          marginBottom: '2rem',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          <h2 style={{ marginBottom: '1rem' }}>Wallet Management</h2>
+          <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+            Create a new wallet or import an existing one to start your spiritual journey.
           </p>
-          <div className="hero-features">
-            <div className="feature-badge">
-              <span>🕉️</span>
-              <span>Daily OM Transactions</span>
-            </div>
-            <div className="feature-badge">
-              <span>🔐</span>
-              <span>Secure Wallet Generation</span>
-            </div>
-            <div className="feature-badge">
-              <span>⚡</span>
-              <span>Real-time Balance</span>
-            </div>
-            <div className="feature-badge">
-              <span>🌟</span>
-              <span>Karma Points System</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Test Card */}
-        <div className="card">
-          <div className="card-header">
-            <h2 className="card-title">Wallet Management</h2>
-            <p className="card-description">
-              Create a new wallet or import an existing one to start your spiritual journey.
-            </p>
-          </div>
-          <div className="card-content">
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button className="btn btn-primary btn-large">
-                <span>🚀</span>
-                <span>Create New Wallet</span>
-              </button>
-              
-              <button className="btn btn-secondary btn-large">
-                <span>📥</span>
-                <span>Import Wallet</span>
-              </button>
-            </div>
+          
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button 
+              style={{
+                background: 'var(--blue-50-base)',
+                color: 'white',
+                border: 'none',
+                padding: '1rem 2rem',
+                borderRadius: '0.5rem',
+                fontSize: '1.1rem',
+                cursor: 'pointer'
+              }}
+              onClick={() => alert('Create Wallet clicked!')}
+            >
+              🚀 Create New Wallet
+            </button>
+            
+            <button 
+              style={{
+                background: 'var(--gray-0)',
+                color: 'var(--text-main)',
+                border: '2px solid var(--blue-50-base)',
+                padding: '1rem 2rem',
+                borderRadius: '0.5rem',
+                fontSize: '1.1rem',
+                cursor: 'pointer'
+              }}
+              onClick={() => alert('Import Wallet clicked!')}
+            >
+              📥 Import Wallet
+            </button>
           </div>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <p>&copy; 2024 Octra Labs. Professional wallet management with enterprise-grade security.</p>
+        
+        <div style={{ 
+          background: 'var(--gray-0)', 
+          color: 'var(--text-main)',
+          padding: '2rem', 
+          borderRadius: '1rem',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ marginBottom: '1rem' }}>🕉️ Daily OM Transaction</h3>
+          <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+            Send your daily OM to connect with the network's spiritual energy.
+          </p>
+          
+          <button 
+            style={{
+              background: 'linear-gradient(135deg, var(--orange-30), var(--orange-40))',
+              color: 'white',
+              border: 'none',
+              padding: '1rem 2rem',
+              borderRadius: '0.5rem',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              width: '100%'
+            }}
+            onClick={() => alert('Daily OM clicked!')}
+          >
+            🕉️ Say OM - Send Daily Transaction
+          </button>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }
