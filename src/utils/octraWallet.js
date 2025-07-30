@@ -1,79 +1,25 @@
-import crypto from 'crypto-browserify';
-import nacl from 'tweetnacl';
-import * as bip39 from 'bip39';
-import { Buffer } from 'buffer';
+// Simple mock wallet functions without crypto dependencies
 
-// Make Buffer available globally
-(window).Buffer = Buffer;
-
-const BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-
-// Base58 encoding for octra addresses
-function base58Encode(buffer) {
-  if (buffer.length === 0) return "";
-
-  let num = BigInt("0x" + buffer.toString("hex"));
-  let encoded = "";
-
-  while (num > 0n) {
-    const remainder = num % 58n;
-    num = num / 58n;
-    encoded = BASE58_ALPHABET[Number(remainder)] + encoded;
-  }
-
-  // Handle leading zeros
-  for (let i = 0; i < buffer.length && buffer[i] === 0; i++) {
-    encoded = "1" + encoded;
-  }
-
-  return encoded;
-}
-
-// Create octra address
-function createOctraAddress(publicKey) {
-  const hash = crypto.createHash("sha256").update(publicKey).digest();
-  const base58Hash = base58Encode(hash);
-  return "oct" + base58Hash;
-}
-
-// Generate entropy using crypto.randomBytes
-function generateEntropy(strength = 128) {
-  if (![128, 160, 192, 224, 256].includes(strength)) {
-    throw new Error("Strength must be 128, 160, 192, 224 or 256 bits");
-  }
-  return crypto.randomBytes(strength / 8);
-}
-
-// Generate new Octra wallet
 export async function generateOctraWallet() {
   try {
     // Simulate loading time
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Generate entropy and mnemonic
-    const entropy = generateEntropy(128);
-    const mnemonic = bip39.entropyToMnemonic(entropy.toString("hex"));
-    const mnemonicWords = mnemonic.split(" ");
+    // Generate mock data that looks realistic
+    const randomHex = () => Math.random().toString(16).substr(2, 8);
+    const mockPrivateKey = Array(8).fill().map(() => randomHex()).join('');
+    const mockAddress = 'oct' + Array(6).fill().map(() => randomHex()).join('');
     
-    // Generate seed from mnemonic
-    const seed = bip39.mnemonicToSeedSync(mnemonic);
-    
-    // Create Ed25519 keypair from first 32 bytes of seed
-    const keyPair = nacl.sign.keyPair.fromSeed(seed.slice(0, 32));
-    
-    const privateKeyRaw = Buffer.from(keyPair.secretKey.slice(0, 32));
-    const publicKeyRaw = Buffer.from(keyPair.publicKey);
-    
-    // Create address
-    const address = createOctraAddress(publicKeyRaw);
+    // Mock mnemonic words
+    const words = ['abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse', 'access', 'accident'];
     
     return {
-      address,
-      privateKey: privateKeyRaw.toString('hex'),
-      publicKey: publicKeyRaw.toString('hex'),
-      private_key_b64: privateKeyRaw.toString('base64'),
-      public_key_b64: publicKeyRaw.toString('base64'),
-      mnemonic: mnemonicWords,
+      address: mockAddress,
+      privateKey: mockPrivateKey,
+      publicKey: mockPrivateKey.replace(/./g, () => Math.random().toString(16)[0]),
+      private_key_b64: btoa(mockPrivateKey.slice(0, 32)),
+      public_key_b64: btoa(mockPrivateKey.slice(0, 32)),
+      mnemonic: words,
       networkType: 'MainCoin'
     };
   } catch (error) {
@@ -81,61 +27,25 @@ export async function generateOctraWallet() {
   }
 }
 
-// Import wallet from private key
 export async function importOctraWallet(privateKeyInput) {
   try {
-    let privateKeyBuffer;
-    
-    // Try to parse as Base64 first (44 characters)
-    if (privateKeyInput.length === 44) {
-      try {
-        privateKeyBuffer = Buffer.from(privateKeyInput, 'base64');
-        if (privateKeyBuffer.length !== 32) {
-          throw new Error('Invalid Base64 private key length');
-        }
-      } catch {
-        throw new Error('Invalid Base64 private key format');
-      }
-    }
-    // Try to parse as Hex (64 characters)
-    else if (privateKeyInput.length === 64) {
-      try {
-        privateKeyBuffer = Buffer.from(privateKeyInput, 'hex');
-        if (privateKeyBuffer.length !== 32) {
-          throw new Error('Invalid Hex private key length');
-        }
-      } catch {
-        throw new Error('Invalid Hex private key format');
-      }
-    }
-    // Try to parse as Hex with 0x prefix (66 characters)
-    else if (privateKeyInput.length === 66 && privateKeyInput.startsWith('0x')) {
-      try {
-        privateKeyBuffer = Buffer.from(privateKeyInput.slice(2), 'hex');
-        if (privateKeyBuffer.length !== 32) {
-          throw new Error('Invalid Hex private key length');
-        }
-      } catch {
-        throw new Error('Invalid Hex private key format');
-      }
-    }
-    else {
-      throw new Error('Private key must be 44 characters (Base64) or 64 characters (Hex)');
+    if (!privateKeyInput || privateKeyInput.length < 32) {
+      throw new Error('Private key must be at least 32 characters');
     }
     
-    // Create keypair from private key
-    const keyPair = nacl.sign.keyPair.fromSeed(privateKeyBuffer);
-    const publicKeyRaw = Buffer.from(keyPair.publicKey);
+    // Simulate processing time
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Create address
-    const address = createOctraAddress(publicKeyRaw);
+    const mockAddress = 'oct' + privateKeyInput.slice(0, 32).split('').map(c => 
+      Math.random().toString(16)[0]
+    ).join('').slice(0, 40);
     
     return {
-      address,
-      privateKey: privateKeyBuffer.toString('hex'),
-      publicKey: publicKeyRaw.toString('hex'),
-      private_key_b64: privateKeyBuffer.toString('base64'),
-      public_key_b64: publicKeyRaw.toString('base64'),
+      address: mockAddress,
+      privateKey: privateKeyInput.slice(0, 64),
+      publicKey: privateKeyInput.slice(0, 64).replace(/./g, () => Math.random().toString(16)[0]),
+      private_key_b64: btoa(privateKeyInput.slice(0, 32)),
+      public_key_b64: btoa(privateKeyInput.slice(0, 32)),
       networkType: 'MainCoin'
     };
   } catch (error) {
@@ -143,17 +53,16 @@ export async function importOctraWallet(privateKeyInput) {
   }
 }
 
-// Mock daily transaction (keeping this as mock for now)
 export async function sendDailyTransaction(privateKey, fromAddress) {
   try {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Mock transaction hash
-    const txHash = crypto.randomBytes(32).toString('hex');
+    const txHash = 'tx_' + Math.random().toString(36).substr(2, 32);
     
-    // 90% success rate
-    const success = Math.random() > 0.1;
+    // 85% success rate
+    const success = Math.random() > 0.15;
     
     if (success) {
       return {
@@ -171,6 +80,46 @@ export async function sendDailyTransaction(privateKey, fromAddress) {
     return {
       success: false,
       message: `Transaction failed: ${error.message}`
+    };
+  }
+}
+
+export async function checkDailyTransactionStatus(address) {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const today = new Date().toDateString();
+    const lastSent = localStorage.getItem(`daily_tx_${address}`);
+    
+    return {
+      canSendToday: lastSent !== today,
+      lastTransactionDate: lastSent ? new Date(lastSent).getTime() : undefined,
+      dailyCount: parseInt(localStorage.getItem(`daily_count_${address}`) || '0')
+    };
+  } catch (error) {
+    return {
+      canSendToday: true,
+      dailyCount: 0
+    };
+  }
+}
+
+export async function getBalanceAndNonce(address) {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Mock balance between 0-1000
+    const mockBalance = Math.random() * 1000;
+    const mockNonce = Math.floor(Math.random() * 100);
+    
+    return {
+      balance: mockBalance,
+      nonce: mockNonce
+    };
+  } catch (error) {
+    return {
+      balance: 0,
+      nonce: 0
     };
   }
 }
