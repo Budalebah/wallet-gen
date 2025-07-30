@@ -1,26 +1,39 @@
 import crypto from "crypto";
 import fs from "fs";
+import { promises as fsPromises } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import nacl from "tweetnacl";
 import bip39 from "bip39";
 
-import indexHtml from "./static/index.html" with { type: "text" };
-import logoSvg from "./static/logo.svg" with { type: "text" };
-import foundersGroteskFontPath from "./static/founders-grotesk-bold.woff2" with { type: "file" };
-import nationalFontPath from "./static/national-regular.woff2" with { type: "file" };
-
 const __filename: string = fileURLToPath(import.meta.url);
 const __dirname: string = path.dirname(__filename);
 
+let indexHtml: string;
+let logoSvg: string;
 let foundersGroteskFont: ArrayBuffer;
 let nationalFont: ArrayBuffer;
 
 async function loadAssets() {
   try {
-    foundersGroteskFont = await Bun.file(foundersGroteskFontPath).arrayBuffer();
-    nationalFont = await Bun.file(nationalFontPath).arrayBuffer();
+    // Load text assets
+    indexHtml = await fsPromises.readFile(path.join(__dirname, "static/index.html"), "utf8");
+    logoSvg = await fsPromises.readFile(path.join(__dirname, "static/logo.svg"), "utf8");
+    
+    // Load font assets as ArrayBuffers
+    const foundersGroteskBuffer = await fsPromises.readFile(path.join(__dirname, "static/founders-grotesk-bold.woff2"));
+    const nationalBuffer = await fsPromises.readFile(path.join(__dirname, "static/national-regular.woff2"));
+    
+    foundersGroteskFont = foundersGroteskBuffer.buffer.slice(
+      foundersGroteskBuffer.byteOffset,
+      foundersGroteskBuffer.byteOffset + foundersGroteskBuffer.byteLength
+    );
+    nationalFont = nationalBuffer.buffer.slice(
+      nationalBuffer.byteOffset,
+      nationalBuffer.byteOffset + nationalBuffer.byteLength
+    );
   } catch (error) {
+    console.error("Error loading assets:", error);
   }
 }
 
@@ -658,7 +671,7 @@ await loadAssets();
 
 const PORT: number = 8888;
 
-const server = Bun.serve({
+const server = {
   port: PORT,
   hostname: "0.0.0.0",
   async fetch(request: Request): Promise<Response> {
@@ -700,7 +713,45 @@ const server = Bun.serve({
 
     return new Response("Not Found", { status: 404 });
   },
+};
+
+// Create HTTP server using Node.js
+import { createServer } from "http";
+
+const httpServer = createServer(async (req, res) => {
+  try {
+    const url = `http://${req.headers.host}${req.url}`;
+    const request = new Request(url, {
+      method: req.method,
+      headers: req.headers as any,
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
+    });
+    
+    const response = await server.fetch(request);
+    
+    res.statusCode = response.status;
+    response.headers.forEach((value, key) => {
+      res.setHeader(key, value);
+    });
+    
+    if (response.body) {
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+      }
+    }
+    res.end();
+  } catch (error) {
+    console.error("Server error:", error);
+    res.statusCode = 500;
+    res.end("Internal Server Error");
+  }
 });
 
-console.log("octra wallet generator server");
-console.log(`The server is running at: http://localhost:${PORT}`);
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log("octra wallet generator server");
+  console.log(`The server is running at: http://localhost:${PORT}`);
+});
+
