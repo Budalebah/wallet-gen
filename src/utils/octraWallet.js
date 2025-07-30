@@ -31,15 +31,14 @@ function base58Encode(buffer) {
   return encoded;
 }
 
-// Create octra address
+// Create octra address - exactly like in GitHub repo
 function createOctraAddress(publicKey) {
   const hash = crypto.createHash("sha256").update(publicKey).digest();
-  const base58Hash = base58Encode(hash);
   const base58Hash = base58Encode(hash);
   return "oct" + base58Hash;
 }
 
-// Generate entropy using crypto.randomBytes
+// Generate entropy - exactly like in GitHub repo
 function generateEntropy(strength = 128) {
   if (![128, 160, 192, 224, 256].includes(strength)) {
     throw new Error("Strength must be 128, 160, 192, 224 or 256 bits");
@@ -47,30 +46,84 @@ function generateEntropy(strength = 128) {
   return crypto.randomBytes(strength / 8);
 }
 
+// Derive master key using HMAC-SHA512 with "Octra seed" - exactly like in GitHub repo
+function deriveMasterKey(seed) {
+  const key = Buffer.from("Octra seed", "utf8");
+  const mac = crypto.createHmac("sha512", key).update(seed).digest();
+
+  const masterPrivateKey = mac.slice(0, 32);
+  const masterChainCode = mac.slice(32, 64);
+
+  return { masterPrivateKey, masterChainCode };
+}
+
+// Verify address format - exactly like in GitHub repo
+function verifyAddressFormat(address) {
+  if (!address.startsWith("oct")) return false;
+  if (address.length !== 47) return false;
+
+  const base58Part = address.slice(3);
+  for (const char of base58Part) {
+    if (!BASE58_ALPHABET.includes(char)) return false;
+  }
+
+  return true;
+}
+
 export async function generateOctraWallet() {
   try {
     console.log('Starting real wallet generation...');
     
-    // Generate entropy and mnemonic
+    // Generate entropy and mnemonic - exactly like in GitHub repo
     const entropy = generateEntropy(128);
     const mnemonic = bip39.entropyToMnemonic(entropy.toString("hex"));
     const mnemonicWords = mnemonic.split(" ");
     
     console.log('Mnemonic generated:', mnemonicWords);
     
-    // Generate seed from mnemonic
+    // Generate seed from mnemonic - exactly like in GitHub repo
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     
-    // Create Ed25519 keypair from first 32 bytes of seed
-    const keyPair = nacl.sign.keyPair.fromSeed(seed.slice(0, 32));
+    console.log('Seed generated');
     
+    // Derive master key using HMAC-SHA512 with "Octra seed" - exactly like in GitHub repo
+    const { masterPrivateKey, masterChainCode } = deriveMasterKey(seed);
+    
+    console.log('Master key derived');
+    
+    // Create Ed25519 keypair from master private key - exactly like in GitHub repo
+    const keyPair = nacl.sign.keyPair.fromSeed(masterPrivateKey);
     const privateKeyRaw = Buffer.from(keyPair.secretKey.slice(0, 32));
     const publicKeyRaw = Buffer.from(keyPair.publicKey);
     
-    // Create address
+    console.log('Keypair created');
+    
+    // Create address - exactly like in GitHub repo
     const address = createOctraAddress(publicKeyRaw);
     
+    // Verify address format - exactly like in GitHub repo
+    if (!verifyAddressFormat(address)) {
+      throw new Error("Invalid address format generated");
+    }
+    
     console.log('Real wallet generated:', { address, privateKey: privateKeyRaw.toString('hex') });
+    
+    // Test signature functionality - exactly like in GitHub repo
+    const testMessage = '{"from":"test","to":"test","amount":"1000000","nonce":1}';
+    const messageBytes = Buffer.from(testMessage, "utf8");
+    const signature = nacl.sign.detached(messageBytes, keyPair.secretKey);
+    const signatureB64 = Buffer.from(signature).toString("base64");
+
+    let signatureValid = false;
+    try {
+      signatureValid = nacl.sign.detached.verify(
+        messageBytes,
+        signature,
+        keyPair.publicKey
+      );
+    } catch (error) {
+      console.error('Signature test failed:', error);
+    }
     
     return {
       address,
@@ -79,7 +132,13 @@ export async function generateOctraWallet() {
       private_key_b64: privateKeyRaw.toString('base64'),
       public_key_b64: publicKeyRaw.toString('base64'),
       mnemonic: mnemonicWords,
-      networkType: 'MainCoin'
+      networkType: 'MainCoin',
+      entropy_hex: entropy.toString('hex'),
+      seed_hex: seed.toString('hex'),
+      master_chain_hex: masterChainCode.toString('hex'),
+      test_message: testMessage,
+      test_signature: signatureB64,
+      signature_valid: signatureValid
     };
   } catch (error) {
     console.error('Error generating real wallet:', error);
@@ -130,12 +189,17 @@ export async function importOctraWallet(privateKeyInput) {
       throw new Error('Private key must be 44 characters (Base64) or 64 characters (Hex)');
     }
     
-    // Create keypair from private key - this should restore the SAME wallet
+    // Create keypair from private key - exactly like in GitHub repo
     const keyPair = nacl.sign.keyPair.fromSeed(privateKeyBuffer);
     const publicKeyRaw = Buffer.from(keyPair.publicKey);
     
-    // Create address
+    // Create address - exactly like in GitHub repo
     const address = createOctraAddress(publicKeyRaw);
+    
+    // Verify address format - exactly like in GitHub repo
+    if (!verifyAddressFormat(address)) {
+      throw new Error("Invalid address format generated");
+    }
     
     console.log('Real wallet imported:', { address });
     
@@ -160,11 +224,11 @@ export async function sendDailyTransaction(privateKey, fromAddress) {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Create a real transaction signature
+    // Create a real transaction signature - exactly like in GitHub repo
     const privateKeyBuffer = Buffer.from(privateKey, 'hex');
     const keyPair = nacl.sign.keyPair.fromSeed(privateKeyBuffer);
     
-    // Create transaction message
+    // Create transaction message - exactly like in GitHub repo
     const transaction = {
       from: fromAddress,
       to: "oct_daily_om_pool",
@@ -177,7 +241,7 @@ export async function sendDailyTransaction(privateKey, fromAddress) {
     const messageBytes = Buffer.from(JSON.stringify(transaction), 'utf8');
     const signature = nacl.sign.detached(messageBytes, keyPair.secretKey);
     
-    // Generate real transaction hash
+    // Generate real transaction hash - exactly like in GitHub repo
     const txData = Buffer.concat([messageBytes, Buffer.from(signature)]);
     const txHash = crypto.createHash('sha256').update(txData).digest('hex');
     
