@@ -725,6 +725,7 @@ const httpServer = createServer(async (req, res) => {
       method: req.method,
       headers: req.headers as any,
       body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
+      ...(req.method !== 'GET' && req.method !== 'HEAD' ? { duplex: 'half' } : {}),
     });
     
     const response = await server.fetch(request);
