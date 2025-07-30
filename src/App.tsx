@@ -3,11 +3,7 @@ import WalletGenerator from './components/WalletGenerator';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <WalletGenerator />
-    </div>
-  );
+  return <WalletGenerator />;
 }
 
 export default App;
