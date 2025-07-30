@@ -15,6 +15,45 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
   
+  /* Colors from Figma design system */
+  --blue-50-base: #0000db;
+  --blue-40: #043aff;
+  --blue-30: #6196ff;
+  --blue-20: #b1c8fb;
+  --blue-10: #ecf2ff;
+  --blue-60: #0808a0;
+  --blue-70: #06066f;
+  --blue-80: #040525;
+  
+  --gray-0: #ffffff;
+  --gray-10: #f1f1f1;
+  --gray-20: #eaeaea;
+  --gray-30: #dedede;
+  --gray-40: #9b9b9b;
+  --gray-50: #696969;
+  --gray-60: #313131;
+  --gray-70: #222222;
+  --gray-80: #181818;
+
+  --orange-10: #ffeec2;
+  --orange-20: #fcb73e;
+  --orange-30: #ef8b17;
+  --orange-40: #d97400;
+  --orange-80: #432f18;
+  
+  --text-main: #222222;
+  --button-primary-text: #ffffff;
+  --template-background: #ffffff;
+  --border-disabled: #dedede;
+  --border-color-500: #15151566;
+  
+  /* Legacy variables for compatibility */
+  --background-default-color: #181818;
+  --background-primary-color: var(--blue-50-base);
+  --text-primary-color: var(--button-primary-text);
+  --text-inverted-color: var(--button-primary-text);
+  --border-color: var(--gray-40);
+  
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
