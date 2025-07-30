@@ -180,32 +180,79 @@ const SimpleWallet = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0 }}>🕉️ Octra OM Wallet</h2>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            onClick={() => setShowImportWallet(true)}
-            className="btn btn-secondary"
-          >
-            Import Wallet
-          </button>
+      {/* Hero Section */}
+      <section className="hero-section">
+        <h1 className="hero-title">🕉️ Octra OM Wallet</h1>
+        <p className="hero-subtitle">
+          Connect with the Octra network spiritually through daily OM transactions. 
+          Generate secure wallets and participate in the ecosystem's harmony.
+        </p>
+        <div className="hero-features">
+          <div className="feature-badge">
+            <span>🕉️</span>
+            <span>Daily OM Transactions</span>
+          </div>
+          <div className="feature-badge">
+            <span>🔐</span>
+            <span>Secure Wallet Generation</span>
+          </div>
+          <div className="feature-badge">
+            <span>⚡</span>
+            <span>Real-time Balance</span>
+          </div>
+          <div className="feature-badge">
+            <span>🌟</span>
+            <span>Karma Points System</span>
+          </div>
+        </div>
+      </section>
 
-          <button
-            onClick={handleCreateWallet}
-            disabled={isLoading}
-            className="px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-primary-blue-hover transition-colors disabled:opacity-50"
-          >
-            {isLoading ? 'Creating...' : 'Create Wallet'}
-          </button>
-          {activeWallet && (
+      {/* Wallet Actions */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">Wallet Management</h2>
+          <p className="card-description">
+            Create a new wallet or import an existing one to start your spiritual journey.
+          </p>
+        </div>
+        <div className="card-content">
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
-              onClick={fetchBalance}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={handleCreateWallet}
+              disabled={isLoading}
+              className="btn btn-primary btn-large"
             >
-              Refresh Balance
+              {isLoading ? (
+                <>
+                  <span>🔄</span>
+                  <span>Creating...</span>
+                </>
+              ) : (
+                <>
+                  <span>🚀</span>
+                  <span>Create New Wallet</span>
+                </>
+              )}
             </button>
-          )}
+            
+            <button
+              onClick={() => setShowImportWallet(true)}
+              className="btn btn-secondary btn-large"
+            >
+              <span>📥</span>
+              <span>Import Wallet</span>
+            </button>
+
+            {activeWallet && (
+              <button
+                onClick={fetchBalance}
+                className="btn btn-secondary"
+              >
+                <span>🔄</span>
+                <span>Refresh Balance</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -218,27 +265,31 @@ const SimpleWallet = () => {
           borderRadius: 'var(--radius-md)',
           border: '1px solid var(--error-red)'
         }}>
-          {error}
+          <strong>⚠️ Error:</strong> {error}
         </div>
       )}
 
       {/* Wallet Info */}
       {activeWallet && (
         <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">Active Wallet</h3>
+            <p className="card-description">Your current wallet information and balance.</p>
+          </div>
           <div className="card-content">
-            <h3 className="card-title">Wallet Information</h3>
-            <div className="grid grid-cols-2">
-              <div>
-                <p className="field-label">Address:</p>
-                <p className="field-value">{activeWallet.address}</p>
+            <div className="grid grid-cols-1">
+              <div className="field-group">
+                <label className="field-label">📍 Wallet Address</label>
+                <div className="field-value address">{activeWallet.address}</div>
               </div>
-              <div>
-                <p className="field-label">Balance:</p>
-                <p className={`field-value ${parseFloat(balance) > 0 ? 'highlight' : 'status-invalid'}`}>
+              
+              <div className="field-group">
+                <label className="field-label">💰 Balance</label>
+                <div className={`field-value ${parseFloat(balance) > 0 ? 'highlight' : 'status-invalid'}`}>
                   {balance} OCT
-                </p>
+                </div>
                 {parseFloat(balance) <= 0 && (
-                  <p style={{ fontSize: '0.75rem', color: 'var(--error-red)', marginTop: '0.25rem' }}>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--error-red)', marginTop: '0.5rem' }}>
                     ⚠️ No balance - you need OCT tokens to send transactions
                   </p>
                 )}
@@ -251,39 +302,38 @@ const SimpleWallet = () => {
       {/* Daily OM Section */}
       {activeWallet && (
         <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">🕉️ Daily OM Transaction</h3>
+            <p className="card-description">
+              Send your daily OM to connect with the network's spiritual energy.
+            </p>
+          </div>
           <div className="card-content">
-            <h3 className="card-title">
-              🕉️ Daily OM Transaction
-            </h3>
-            
             {/* Daily Status */}
             <div style={{ 
               background: 'var(--light-gray)', 
               padding: '1rem', 
               borderRadius: 'var(--radius-md)', 
-              marginBottom: '1rem',
+              marginBottom: '1.5rem',
               border: '1px solid var(--border-gray)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontWeight: '500' }}>Today's Status:</span>
-                <span className={`${
-                  dailyTransactionStatus.canSendToday 
-                    ? 'status-valid' 
-                    : 'status-invalid'
-                }`} style={{ 
+                <span style={{ fontWeight: '600' }}>Today's Status:</span>
+                <span style={{ 
                   padding: '0.25rem 0.75rem', 
                   borderRadius: '9999px', 
                   fontSize: '0.875rem',
+                  fontWeight: '500',
                   background: dailyTransactionStatus.canSendToday ? 'var(--success-green)' : 'var(--warning-orange)',
                   color: 'white'
                 }}>
-                  {dailyTransactionStatus.canSendToday ? 'Available' : 'Already Sent Today'}
+                  {dailyTransactionStatus.canSendToday ? '✅ Available' : '⏰ Already Sent Today'}
                 </span>
               </div>
               <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                <div>Daily Count: {dailyTransactionStatus.dailyCount}</div>
+                <div><strong>Daily Count:</strong> {dailyTransactionStatus.dailyCount}</div>
                 {dailyTransactionStatus.lastTransactionDate && (
-                  <div>Last Transaction: {new Date(dailyTransactionStatus.lastTransactionDate).toLocaleString()}</div>
+                  <div><strong>Last Transaction:</strong> {new Date(dailyTransactionStatus.lastTransactionDate).toLocaleString()}</div>
                 )}
               </div>
             </div>
@@ -292,16 +342,14 @@ const SimpleWallet = () => {
             <button
               onClick={handleSendDailyTransaction}
               disabled={isDailySending || !dailyTransactionStatus.canSendToday || parseFloat(balance) <= 0}
-              className={`btn btn-full btn-large ${
-                dailyTransactionStatus.canSendToday && !isDailySending && parseFloat(balance) > 0
-                  ? 'btn-primary'
-                  : ''
-              }`}
+              className="btn btn-full btn-large"
               style={{
                 background: dailyTransactionStatus.canSendToday && !isDailySending && parseFloat(balance) > 0
                   ? 'linear-gradient(135deg, var(--warning-orange), var(--error-red))'
                   : 'var(--secondary-gray)',
-                marginBottom: '1rem'
+                marginBottom: '1.5rem',
+                fontSize: '1.1rem',
+                fontWeight: '600'
               }}
             >
               {isDailySending ? (
@@ -329,45 +377,49 @@ const SimpleWallet = () => {
             {/* Transaction Result */}
             {dailyTransactionResult && (
               <div style={{
-                padding: '1rem',
-                borderRadius: 'var(--radius-md)',
+                padding: '1.5rem',
+                borderRadius: 'var(--radius-lg)',
                 background: dailyTransactionResult.success ? 'var(--success-green)' : 'var(--error-red)',
                 color: 'white',
-                marginBottom: '1rem'
+                marginBottom: '1.5rem'
               }}>
-                <div style={{ fontWeight: '500' }}>
-                  {dailyTransactionResult.success ? '✓ Success!' : '✗ Error'}
+                <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                  {dailyTransactionResult.success ? '✅ Success!' : '❌ Error'}
                 </div>
-                <div style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                <div style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>
                   {dailyTransactionResult.message}
                 </div>
                 {dailyTransactionResult.txHash && (
                   <div style={{
-                    marginTop: '0.75rem',
-                    padding: '0.75rem',
+                    marginTop: '1rem',
+                    padding: '1rem',
                     background: 'rgba(0,0,0,0.2)',
                     borderRadius: 'var(--radius-md)'
                   }}>
-                    <div style={{ fontSize: '0.75rem', marginBottom: '0.5rem' }}>Transaction Hash:</div>
+                    <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', fontWeight: '500' }}>Transaction Hash:</div>
                     <div style={{ 
                       fontFamily: 'monospace', 
                       fontSize: '0.75rem', 
                       wordBreak: 'break-all', 
-                      marginBottom: '0.75rem' 
+                      marginBottom: '1rem',
+                      background: 'rgba(0,0,0,0.2)',
+                      padding: '0.5rem',
+                      borderRadius: 'var(--radius-sm)'
                     }}>
                       {dailyTransactionResult.txHash}
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <button
                         onClick={() => navigator.clipboard.writeText(dailyTransactionResult.txHash!)}
                         className="btn"
                         style={{ 
-                          padding: '0.25rem 0.75rem', 
-                          fontSize: '0.75rem',
-                          background: 'var(--primary-blue)'
+                          padding: '0.5rem 1rem', 
+                          fontSize: '0.875rem',
+                          background: 'var(--primary-blue)',
+                          minHeight: 'auto'
                         }}
                       >
-                        Copy Hash
+                        📋 Copy Hash
                       </button>
                       {dailyTransactionResult.txHash && 
                        dailyTransactionResult.txHash !== 'Transaction submitted' && 
@@ -378,10 +430,11 @@ const SimpleWallet = () => {
                           rel="noopener noreferrer"
                           className="btn"
                           style={{ 
-                            padding: '0.25rem 0.75rem', 
-                            fontSize: '0.75rem',
+                            padding: '0.5rem 1rem', 
+                            fontSize: '0.875rem',
                             background: '#8b5cf6',
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            minHeight: 'auto'
                           }}
                         >
                           🔍 View on Explorer
@@ -395,16 +448,19 @@ const SimpleWallet = () => {
 
             {/* Daily OM Info */}
             <div style={{
-              padding: '1rem',
+              padding: '1.5rem',
               background: 'var(--primary-blue-light)',
-              borderRadius: 'var(--radius-md)',
+              borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--primary-blue)'
             }}>
-              <h4 style={{ color: 'var(--primary-blue)', fontWeight: '500', marginBottom: '0.5rem' }}>🌟 About Daily OM</h4>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+              <h4 style={{ color: 'var(--primary-blue)', fontWeight: '600', marginBottom: '0.75rem', fontSize: '1.1rem' }}>
+                🌟 About Daily OM
+              </h4>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                 Send a daily OM transaction to connect with the Octra network spiritually. 
-                Each day, you can send one free transaction that contributes to network harmony 
-                and earns you karma points in the ecosystem.
+                Each day, you can send one transaction that contributes to network harmony 
+                and earns you karma points in the ecosystem. This practice helps maintain 
+                the spiritual balance of the network while rewarding participants.
               </p>
             </div>
           </div>
@@ -425,11 +481,14 @@ const SimpleWallet = () => {
           justifyContent: 'center',
           zIndex: 10001
         }}>
-          <div className="card" style={{ width: '100%', maxWidth: '28rem', position: 'relative', zIndex: 10002 }}>
+          <div className="card" style={{ width: '100%', maxWidth: '32rem', position: 'relative', zIndex: 10002 }}>
+            <div className="card-header">
+              <h3 className="card-title">📥 Import Existing Wallet</h3>
+              <p className="card-description">Enter your private key to import an existing wallet.</p>
+            </div>
             <div className="card-content">
-              <h3 className="card-title">Import Wallet</h3>
-              <div style={{ marginBottom: '1rem' }}>
-                <label className="field-label">Private Key</label>
+              <div className="field-group">
+                <label className="field-label">🔐 Private Key</label>
                 <textarea
                   value={importPrivateKey}
                   onChange={(e) => setImportPrivateKey(e.target.value)}
@@ -440,26 +499,29 @@ const SimpleWallet = () => {
                     borderRadius: 'var(--radius-md)',
                     height: '6rem',
                     resize: 'none',
-                    fontFamily: 'monospace'
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem'
                   }}
-                  placeholder="Enter your private key (Base64 format)..."
+                  placeholder="Enter your private key (Base64 or Hex format)..."
                 />
                 <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  💡 Supported formats: Base64 (44 characters) or Hex (128 characters)
+                  💡 Supported formats: Base64 (44 characters) or Hex (64 characters)
                 </div>
               </div>
+              
               <div style={{
                 background: 'var(--primary-blue-light)',
                 border: '1px solid var(--primary-blue)',
                 borderRadius: 'var(--radius-md)',
-                padding: '0.75rem',
-                marginBottom: '1rem'
+                padding: '1rem',
+                marginBottom: '1.5rem'
               }}>
-                <p style={{ color: 'var(--primary-blue)', fontSize: '0.875rem' }}>
-                  💡 Enter your private key to import an existing wallet. 
-                  Make sure you're in a secure environment.
+                <p style={{ color: 'var(--primary-blue)', fontSize: '0.875rem', lineHeight: '1.5' }}>
+                  🔒 <strong>Security Notice:</strong> Enter your private key to import an existing wallet. 
+                  Make sure you're in a secure environment and never share your private key with anyone.
                 </p>
               </div>
+              
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
                 <button
                   onClick={() => {
@@ -499,43 +561,51 @@ const SimpleWallet = () => {
           zIndex: 9999
         }}>
           <div className="card" style={{ width: '100%', maxWidth: '48rem', position: 'relative', zIndex: 10000 }}>
+            <div className="card-header">
+              <h3 className="card-title">🎉 Wallet Created Successfully!</h3>
+              <p className="card-description">Your new Octra wallet has been generated. Please save this information securely.</p>
+            </div>
             <div className="card-content">
-              <h3 className="card-title">🔐 Wallet Created Successfully!</h3>
-              
-              <div style={{ marginBottom: '1.5rem' }}>
+              <div className="grid grid-cols-1">
                 <div className="field-group">
-                  <p className="field-label">Address:</p>
-                  <p className="field-value">{currentWalletData.address}</p>
+                  <label className="field-label">📍 Wallet Address</label>
+                  <div className="field-value address">{currentWalletData.address}</div>
                 </div>
+                
                 <div className="field-group">
-                  <p className="field-label">Network Type:</p>
-                  <p className="field-value">{currentWalletData.networkType}</p>
+                  <label className="field-label">🌐 Network Type</label>
+                  <div className="field-value">{currentWalletData.networkType}</div>
                 </div>
+                
                 <div className="field-group">
-                  <p className="field-label">Private Key (Base64):</p>
-                  <p className="field-value">{currentWalletData.private_key_b64}</p>
+                  <label className="field-label">🔐 Private Key (Base64)</label>
+                  <div className="field-value">{currentWalletData.private_key_b64}</div>
                 </div>
+                
                 <div className="field-group">
-                  <p className="field-label">Mnemonic Phrase:</p>
-                  <p className="field-value">{currentWalletData.mnemonic?.join(' ')}</p>
+                  <label className="field-label">🔑 Mnemonic Phrase</label>
+                  <div className="field-value highlight">{currentWalletData.mnemonic?.join(' ')}</div>
                 </div>
               </div>
               
               <div className="security-warning">
                 <div className="warning-icon">⚠️</div>
                 <div className="warning-content">
-                  <h4>Security Notice</h4>
-                  <p>Save your private key and mnemonic phrase in a secure location. 
-                  Anyone with access to these can control your wallet. Never share them with anyone.</p>
+                  <h4>Critical Security Notice</h4>
+                  <p>
+                    Save your private key and mnemonic phrase in a secure location offline. 
+                    Anyone with access to these can control your wallet and all its funds. 
+                    Never share them with anyone or store them online.
+                  </p>
                 </div>
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
                 <button
                   onClick={() => setShowPrivateKey(false)}
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-large"
                 >
-                  I've Saved My Keys
+                  ✅ I've Saved My Keys Securely
                 </button>
               </div>
             </div>
