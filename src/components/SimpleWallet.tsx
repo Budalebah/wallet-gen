@@ -179,14 +179,14 @@ const SimpleWallet = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">🕉️ Octra OM Wallet</h2>
-        <div className="flex space-x-2">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0 }}>🕉️ Octra OM Wallet</h2>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
             onClick={() => setShowImportWallet(true)}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            className="btn btn-secondary"
           >
             Import Wallet
           </button>
@@ -211,7 +211,13 @@ const SimpleWallet = () => {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+        <div style={{ 
+          background: 'var(--error-red)', 
+          color: 'white', 
+          padding: '1rem', 
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--error-red)'
+        }}>
           {error}
         </div>
       )}
@@ -220,7 +226,325 @@ const SimpleWallet = () => {
       {activeWallet && (
         <div className="card">
           <div className="card-content">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Wallet Information</h3>
+            <h3 className="card-title">Wallet Information</h3>
+            <div className="grid grid-cols-2">
+              <div>
+                <p className="field-label">Address:</p>
+                <p className="field-value">{activeWallet.address}</p>
+              </div>
+              <div>
+                <p className="field-label">Balance:</p>
+                <p className={`field-value ${parseFloat(balance) > 0 ? 'highlight' : 'status-invalid'}`}>
+                  {balance} OCT
+                </p>
+                {parseFloat(balance) <= 0 && (
+                  <p style={{ fontSize: '0.75rem', color: 'var(--error-red)', marginTop: '0.25rem' }}>
+                    ⚠️ No balance - you need OCT tokens to send transactions
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Daily OM Section */}
+      {activeWallet && (
+        <div className="card">
+          <div className="card-content">
+            <h3 className="card-title">
+              🕉️ Daily OM Transaction
+            </h3>
+            
+            {/* Daily Status */}
+            <div style={{ 
+              background: 'var(--light-gray)', 
+              padding: '1rem', 
+              borderRadius: 'var(--radius-md)', 
+              marginBottom: '1rem',
+              border: '1px solid var(--border-gray)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: '500' }}>Today's Status:</span>
+                <span className={`${
+                  dailyTransactionStatus.canSendToday 
+                    ? 'status-valid' 
+                    : 'status-invalid'
+                }`} style={{ 
+                  padding: '0.25rem 0.75rem', 
+                  borderRadius: '9999px', 
+                  fontSize: '0.875rem',
+                  background: dailyTransactionStatus.canSendToday ? 'var(--success-green)' : 'var(--warning-orange)',
+                  color: 'white'
+                }}>
+                  {dailyTransactionStatus.canSendToday ? 'Available' : 'Already Sent Today'}
+                </span>
+              </div>
+              <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                <div>Daily Count: {dailyTransactionStatus.dailyCount}</div>
+                {dailyTransactionStatus.lastTransactionDate && (
+                  <div>Last Transaction: {new Date(dailyTransactionStatus.lastTransactionDate).toLocaleString()}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Say OM Button */}
+            <button
+              onClick={handleSendDailyTransaction}
+              disabled={isDailySending || !dailyTransactionStatus.canSendToday || parseFloat(balance) <= 0}
+              className={`btn btn-full btn-large ${
+                dailyTransactionStatus.canSendToday && !isDailySending && parseFloat(balance) > 0
+                  ? 'btn-primary'
+                  : ''
+              }`}
+              style={{
+                background: dailyTransactionStatus.canSendToday && !isDailySending && parseFloat(balance) > 0
+                  ? 'linear-gradient(135deg, var(--warning-orange), var(--error-red))'
+                  : 'var(--secondary-gray)',
+                marginBottom: '1rem'
+              }}
+            >
+              {isDailySending ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ 
+                    animation: 'spin 1s linear infinite',
+                    borderRadius: '50%',
+                    width: '1.25rem',
+                    height: '1.25rem',
+                    border: '2px solid transparent',
+                    borderTop: '2px solid currentColor',
+                    marginRight: '0.5rem'
+                  }}></div>
+                  Sending Daily OM...
+                </div>
+              ) : parseFloat(balance) <= 0 ? (
+                '💰 Need OCT Balance to Send OM'
+              ) : dailyTransactionStatus.canSendToday ? (
+                '🕉️ Say OM - Send Daily Transaction'
+              ) : (
+                '✓ OM Already Sent Today'
+              )}
+            </button>
+
+            {/* Transaction Result */}
+            {dailyTransactionResult && (
+              <div style={{
+                padding: '1rem',
+                borderRadius: 'var(--radius-md)',
+                background: dailyTransactionResult.success ? 'var(--success-green)' : 'var(--error-red)',
+                color: 'white',
+                marginBottom: '1rem'
+              }}>
+                <div style={{ fontWeight: '500' }}>
+                  {dailyTransactionResult.success ? '✓ Success!' : '✗ Error'}
+                </div>
+                <div style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                  {dailyTransactionResult.message}
+                </div>
+                {dailyTransactionResult.txHash && (
+                  <div style={{
+                    marginTop: '0.75rem',
+                    padding: '0.75rem',
+                    background: 'rgba(0,0,0,0.2)',
+                    borderRadius: 'var(--radius-md)'
+                  }}>
+                    <div style={{ fontSize: '0.75rem', marginBottom: '0.5rem' }}>Transaction Hash:</div>
+                    <div style={{ 
+                      fontFamily: 'monospace', 
+                      fontSize: '0.75rem', 
+                      wordBreak: 'break-all', 
+                      marginBottom: '0.75rem' 
+                    }}>
+                      {dailyTransactionResult.txHash}
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(dailyTransactionResult.txHash!)}
+                        className="btn"
+                        style={{ 
+                          padding: '0.25rem 0.75rem', 
+                          fontSize: '0.75rem',
+                          background: 'var(--primary-blue)'
+                        }}
+                      >
+                        Copy Hash
+                      </button>
+                      {dailyTransactionResult.txHash && 
+                       dailyTransactionResult.txHash !== 'Transaction submitted' && 
+                       dailyTransactionResult.txHash.length >= 32 && (
+                        <a
+                          href={`https://octrascan.io/tx/${dailyTransactionResult.txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn"
+                          style={{ 
+                            padding: '0.25rem 0.75rem', 
+                            fontSize: '0.75rem',
+                            background: '#8b5cf6',
+                            textDecoration: 'none'
+                          }}
+                        >
+                          🔍 View on Explorer
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Daily OM Info */}
+            <div style={{
+              padding: '1rem',
+              background: 'var(--primary-blue-light)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--primary-blue)'
+            }}>
+              <h4 style={{ color: 'var(--primary-blue)', fontWeight: '500', marginBottom: '0.5rem' }}>🌟 About Daily OM</h4>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                Send a daily OM transaction to connect with the Octra network spiritually. 
+                Each day, you can send one free transaction that contributes to network harmony 
+                and earns you karma points in the ecosystem.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Wallet Modal */}
+      {showImportWallet && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10001
+        }}>
+          <div className="card" style={{ width: '100%', maxWidth: '28rem', position: 'relative', zIndex: 10002 }}>
+            <div className="card-content">
+              <h3 className="card-title">Import Wallet</h3>
+              <div style={{ marginBottom: '1rem' }}>
+                <label className="field-label">Private Key</label>
+                <textarea
+                  value={importPrivateKey}
+                  onChange={(e) => setImportPrivateKey(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid var(--border-gray)',
+                    borderRadius: 'var(--radius-md)',
+                    height: '6rem',
+                    resize: 'none',
+                    fontFamily: 'monospace'
+                  }}
+                  placeholder="Enter your private key (Base64 format)..."
+                />
+                <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  💡 Supported formats: Base64 (44 characters) or Hex (128 characters)
+                </div>
+              </div>
+              <div style={{
+                background: 'var(--primary-blue-light)',
+                border: '1px solid var(--primary-blue)',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.75rem',
+                marginBottom: '1rem'
+              }}>
+                <p style={{ color: 'var(--primary-blue)', fontSize: '0.875rem' }}>
+                  💡 Enter your private key to import an existing wallet. 
+                  Make sure you're in a secure environment.
+                </p>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={() => {
+                    setShowImportWallet(false)
+                    setImportPrivateKey('')
+                    setError('')
+                  }}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleImportWallet}
+                  disabled={isImporting}
+                  className="btn btn-primary"
+                >
+                  {isImporting ? 'Importing...' : 'Import Wallet'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Private Key Display Modal */}
+      {showPrivateKey && currentWalletData && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div className="card" style={{ width: '100%', maxWidth: '48rem', position: 'relative', zIndex: 10000 }}>
+            <div className="card-content">
+              <h3 className="card-title">🔐 Wallet Created Successfully!</h3>
+              
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div className="field-group">
+                  <p className="field-label">Address:</p>
+                  <p className="field-value">{currentWalletData.address}</p>
+                </div>
+                <div className="field-group">
+                  <p className="field-label">Network Type:</p>
+                  <p className="field-value">{currentWalletData.networkType}</p>
+                </div>
+                <div className="field-group">
+                  <p className="field-label">Private Key (Base64):</p>
+                  <p className="field-value">{currentWalletData.private_key_b64}</p>
+                </div>
+                <div className="field-group">
+                  <p className="field-label">Mnemonic Phrase:</p>
+                  <p className="field-value">{currentWalletData.mnemonic?.join(' ')}</p>
+                </div>
+              </div>
+              
+              <div className="security-warning">
+                <div className="warning-icon">⚠️</div>
+                <div className="warning-content">
+                  <h4>Security Notice</h4>
+                  <p>Save your private key and mnemonic phrase in a secure location. 
+                  Anyone with access to these can control your wallet. Never share them with anyone.</p>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                <button
+                  onClick={() => setShowPrivateKey(false)}
+                  className="btn btn-primary"
+                >
+                  I've Saved My Keys
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Address:</p>
@@ -324,21 +648,21 @@ const SimpleWallet = () => {
                       </button>
                       {dailyTransactionResult.txHash && 
                        dailyTransactionResult.txHash !== 'Transaction submitted' && 
-                       dailyTransactionResult.txHash.length >= 32 && (
-                        <a
-                          href={`https://octrascan.io/tx/${dailyTransactionResult.txHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors inline-block"
-                        >
-                          🔍 View on Explorer
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+          <button
+            onClick={handleCreateWallet}
+            disabled={isLoading}
+            className="btn btn-primary"
+          >
+            {isLoading ? 'Creating...' : 'Create Wallet'}
+          </button>
+          {activeWallet && (
+            <button
+              onClick={fetchBalance}
+              className="btn btn-secondary"
+            >
+              Refresh Balance
+            </button>
+          )}
 
             {/* Daily OM Info */}
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
