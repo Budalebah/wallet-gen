@@ -1,24 +1,21 @@
 {
-  "name": "@octra/wallet-gen",
-  "version": "1.0.0",
-  "description": "octra wallet generator",
-  "main": "./src/server.ts",
+  "name": "octra-wallet",
+  "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/server.ts",
-    "dev": "tsx --watch src/server.ts",
-    "build": "tsc && node dist/server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "tweetnacl": "^1.0.3",
-    "bip39": "^3.1.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "typescript": "^5.3.3",
-    "tsx": "^4.7.0"
-  },
-  "keywords": ["wallet", "crypto", "ed25519", "bip39", "typescript"],
-  "author": "octra labs",
-  "license": "MIT"
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.2.0"
+  }
 }
