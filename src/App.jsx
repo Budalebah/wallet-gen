@@ -316,13 +316,59 @@ function App() {
               </div>
               <div>{dailyResult.message}</div>
               {dailyResult.txHash && (
-                <div style={{ 
-                  marginTop: '0.5rem', 
-                  fontFamily: 'monospace', 
-                  fontSize: '0.8rem',
-                  wordBreak: 'break-all'
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  background: 'rgba(0,0,0,0.2)',
+                  borderRadius: '0.5rem'
                 }}>
-                  TX: {dailyResult.txHash}
+                  <div style={{ fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                    Transaction Hash:
+                  </div>
+                  <div style={{ 
+                    fontFamily: 'monospace', 
+                    fontSize: '0.75rem',
+                    wordBreak: 'break-all',
+                    marginBottom: '1rem',
+                    background: 'rgba(0,0,0,0.2)',
+                    padding: '0.5rem',
+                    borderRadius: '0.25rem'
+                  }}>
+                    {dailyResult.txHash}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(dailyResult.txHash)}
+                      style={{
+                        background: '#667eea',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
+                    >
+                      📋 Copy Hash
+                    </button>
+                    <a
+                      href={`https://octrascan.io/tx/${dailyResult.txHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        background: '#8b5cf6',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '0.25rem',
+                        textDecoration: 'none',
+                        fontSize: '0.8rem',
+                        display: 'inline-block'
+                      }}
+                    >
+                      🔍 View on Explorer
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
