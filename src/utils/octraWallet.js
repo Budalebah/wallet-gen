@@ -35,6 +35,7 @@ function base58Encode(buffer) {
 function createOctraAddress(publicKey) {
   const hash = crypto.createHash("sha256").update(publicKey).digest();
   const base58Hash = base58Encode(hash);
+  const base58Hash = base58Encode(hash);
   return "oct" + base58Hash;
 }
 
