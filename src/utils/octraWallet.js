@@ -129,7 +129,7 @@ export async function importOctraWallet(privateKeyInput) {
       throw new Error('Private key must be 44 characters (Base64) or 64 characters (Hex)');
     }
     
-    // Create keypair from private key
+    // Create keypair from private key - this should restore the SAME wallet
     const keyPair = nacl.sign.keyPair.fromSeed(privateKeyBuffer);
     const publicKeyRaw = Buffer.from(keyPair.publicKey);
     
